@@ -1,6 +1,6 @@
 services:
   mediator:
-    image: bcgovimages/aries-cloudagent:py3.12_1.0.1
+    image: ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.1.0
     depends_on:
       - mediator-db
     entrypoint: /bin/bash

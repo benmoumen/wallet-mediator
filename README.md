@@ -37,7 +37,8 @@ To start the services, run:
 The `docker-compose.yml` file includes the following configurations:
 
 - **Mediator Service**:
-  - Image: `bcgovimages/aries-cloudagent:py3.12_1.0.1`
+
+  - Image: `ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.1.0`
   - Depends on: `mediator-db`
   - Entrypoint: `/bin/bash`
   - Command: Starts the ACA-Py with various configurations.
@@ -54,6 +55,7 @@ The `docker-compose.yml` file includes the following configurations:
 ### Networks and Volumes
 
 - **Networks**:
+
   - `mediator-network`
 
 - **Volumes**:
@@ -62,6 +64,7 @@ The `docker-compose.yml` file includes the following configurations:
 ### Healthchecks
 
 - **Mediator Service**:
+
   - Test: `/bin/bash -c "</dev/tcp/mediator/3000"`
   - Interval: 5s
   - Timeout: 5s
