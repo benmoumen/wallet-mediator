@@ -1,0 +1,78 @@
+services:
+  mediator:
+    image: bcgovimages/aries-cloudagent:py3.12_1.0.1
+    depends_on:
+      - mediator-db
+    entrypoint: /bin/bash
+    command: [
+        '-c',
+        "sleep 14;
+        aca-py start \
+        --label '${MEDIATOR_AGENT_LABEL:-Mediator}' \
+        --inbound-transport http 0.0.0.0 ${MEDIATOR_AGENT_HTTP_IN_PORT} \
+        --inbound-transport ws 0.0.0.0 ${MEDIATOR_AGENT_WS_IN_PORT} \
+        --outbound-transport ws \
+        --outbound-transport http \
+        --endpoint 'https://${MEDIATOR_SERVER_NAME}' 'wss://${MEDIATOR_SERVER_NAME}/ws/' \
+        --emit-new-didcomm-prefix \
+        --no-ledger \
+        --auto-provision \
+        --wallet-type 'askar' \
+        --wallet-name '${MEDIATOR_WALLET_NAME}' \
+        --wallet-key '${MEDIATOR_WALLET_KEY:-mediator}' \
+        --wallet-storage-type 'postgres_storage' \
+        --wallet-storage-config '{\"url\":\"mediator-db:5432\",\"wallet_scheme\":\"DatabasePerWallet\"}' \
+        --wallet-storage-creds '{\"account\":\"${POSTGRESQL_USER}\",\"password\":\"${POSTGRESQL_PASSWORD}\",\"admin_account\":\"${POSTGRESQL_ADMIN_USER}\",\"admin_password\":\"${POSTGRESQL_ADMIN_PASSWORD}\"}' \
+        --open-mediation \
+        --enable-undelivered-queue \
+        --auto-accept-invites \
+        --auto-accept-requests \
+        --auto-ping-connection \
+        --connections-invite \
+        --invite-label 'Mediator Invitation' \
+        --invite-multi-use \
+        --auto-store-credential \
+        --admin 0.0.0.0 ${MEDIATOR_AGENT_HTTP_ADMIN_PORT} \
+        --admin-insecure-mode \
+        --trace-target log \
+        --trace-tag acapy.events \
+        --trace-label 'Mediator.trace' \
+        --debug-connections \
+        --log-level ${LOG_LEVEL}",
+      ]
+    ports:
+      - ${MEDIATOR_AGENT_HTTP_ADMIN_PORT:-3002}:${MEDIATOR_AGENT_HTTP_ADMIN_PORT:-3002}
+      - ${MEDIATOR_AGENT_HTTP_IN_PORT:-3000}:${MEDIATOR_AGENT_HTTP_IN_PORT:-3000}
+      - ${MEDIATOR_AGENT_WS_IN_PORT:-3001}:${MEDIATOR_AGENT_WS_IN_PORT:-3001}
+    networks:
+      - mediator-network
+    healthcheck:
+      test: /bin/bash -c "</dev/tcp/mediator/3000"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mediator-db:
+    image: postgres:15
+    # restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_USER}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRES_ADMIN_PASSWORD: ${POSTGRESQL_ADMIN_PASSWORD}
+    # ports: # Uncomment to access postgres outside of containers
+    # - "5432:5432"
+    networks:
+      - mediator-network
+    volumes:
+      - mediator-wallet:/var/lib/pgsql/data:z
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+networks:
+  mediator-network:
+
+volumes:
+  mediator-wallet:
