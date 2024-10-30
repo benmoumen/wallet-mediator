@@ -19,8 +19,4 @@ This project enables the deployment of an Aries Cloud Agent that serves as a Med
 
 ### Environment Variables
 
-Copy the `.env.sample` file to `.env` and fill in the required values:
-
-```sh
-cp [.env.sample](http://_vscodecontentref_/0) .env
-```
+Copy the `.env.sample` file to `.env` and fill in the required values.
