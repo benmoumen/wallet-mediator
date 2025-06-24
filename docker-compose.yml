@@ -28,7 +28,7 @@ services:
         --auto-accept-invites \
         --auto-accept-requests \
         --auto-ping-connection \
-        --connections-invite \
+        --mediator-connections-invite \
         --invite-label 'Mediator Invitation' \
         --invite-multi-use \
         --auto-store-credential \
