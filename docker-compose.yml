@@ -1,6 +1,6 @@
 services:
   mediator:
-    image: ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2-lts
+    image: ghcr.io/openwallet-foundation/acapy-agent:py3.12-1.2.4
     depends_on:
       - mediator-db
     entrypoint: /bin/bash
